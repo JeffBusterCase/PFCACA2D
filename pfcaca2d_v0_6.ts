@@ -1,6 +1,4 @@
 // PFCACA2D version 0.6
-// This library require Jquery.js!!
-// Remenber to put it in your html file!
 // animate code by Jefferson Bomfim AKA jeffbustercase
 
 class Point {
@@ -32,12 +30,12 @@ class Canvas {
     self(){
         return document.querySelector("#"+this.id) as HTMLCanvasElement;
     }
-	_self(){
-		return document.getElementById(this.id) as HTMLCanvasElement;
-	}
-	__self(){
-		return document.getElementById(this.id);	
-	}
+    _self(){
+	return document.getElementById(this.id) as HTMLCanvasElement;
+    }
+     __self(){
+	return document.getElementById(this.id);	
+    }
     draw(frame:Frame) : Frame {
         var canvasx = this._self().getContext('2d');
         for(var pixel of frame.frame){
@@ -45,19 +43,19 @@ class Canvas {
             canvasx.fillRect(pixel.x, pixel.y, pixel.size, pixel.size);
         }
         this.last = frame;
-		return frame;
+	return frame;
     }
     clear(frame:Frame) : Boolean {
         var canvasx = this.self().getContext("2d");
         for(var pixel of frame.frame){
-           	canvasx.clearRect(pixel.x, pixel.y, pixel.size, pixel.size);
+           canvasx.clearRect(pixel.x, pixel.y, pixel.size, pixel.size);
         }
         return true;
     }
     clearLast() : Boolean {
-		if(this.last == null){
-			return;
-		}
+	if(this.last == null){
+	    return;
+	}
         var canvasx = this.self().getContext("2d");
         for(var pixel of this.last.frame){
             canvasx.clearRect(pixel.x, pixel.y, pixel.size, pixel.size);
@@ -146,32 +144,32 @@ function  rands(x:number) {return rand(x).toString();};
 function main(){
     // Create Button to start the animation
     let button = document.createElement("button");
-	button.textContent = "animate";
-	button.style.backgroundColor = "blue";
+    button.textContent = "animate";
+    button.style.backgroundColor = "blue";
     button.style.color = "white";
     button.style.borderRadius = "3px";
     button.style.border = "solid white 1px";
     
     //initialize a frame Array to get all of then
-	var frames = [];
+    var frames = [];
 	
-	// 60 frames per 5 seconds = 5*60
-	for(var i=1;i<(60*5);i++){
-	    
-	    // Append a new Point(x,y, color, size) per frame
-        var _point = new Point(i, 50, "black", 22);
-        frames.push(new Frame([_point]));
-	}
-	// Create a new Canvas intance
-	let canvas = new Canvas('area', 500, 500);
+    // 60 frames per 5 seconds = 5*60
+     for(var i=1;i<(60*5);i++){
+
+   // Append a new Point(x,y, color, size) per frame
+   var _point = new Point(i, 50, "black", 22);
+   frames.push(new Frame([_point]));
+   }
+   // Create a new Canvas intance
+   let canvas = new Canvas('area', 500, 500);
 	
-	// Create a new Canvas Animation 2D, for the animation
+    // Create a new Canvas Animation 2D, for the animation
     let animationCanvas = new CanvasAnimation2D('area', frames); //CanvasAnimation2D(canvasId, frames)
     
     // Button on click, do function =>
     button.onclick = function(){
-            // for every frame, give 5 milliseconds
-            animationCanvas.play(5);
+        // for every frame, give 5 milliseconds
+        animationCanvas.play(5);
     };
     
     // Create the canvas on the DOM(HTML page ative)
