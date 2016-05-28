@@ -1,4 +1,4 @@
-// PFCACA2D version 0.5
+// PFCACA2D version 0.6
 // This library require Jquery.js!!
 // Remenber to put it in your html file!
 // animate code by Jefferson Bomfim AKA jeffbustercase
