@@ -30,10 +30,10 @@ class Canvas {
         return document.querySelector("#"+this.id) as HTMLCanvasElement;
     }
     _self(){
-	return document.getElementById(this.id) as HTMLCanvasElement;
+	    return document.getElementById(this.id) as HTMLCanvasElement;
     }
      __self(){
-	return document.getElementById(this.id);	
+	    return document.getElementById(this.id);	
     }
     draw(frame:Frame) : Frame {
         var canvasx = this._self().getContext('2d');
