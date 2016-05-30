@@ -1,5 +1,4 @@
 // PFCACA2D version 0.6
-// animate code by Jefferson Bomfim AKA jeffbustercase
 
 class Point {
     constructor(public x:number, public y:number, public color:string,  public size=1){
@@ -12,8 +11,31 @@ class Frame {
 	append(point:Point){
 		this.frame.push(point);
 	}
+	addSprite(sprite:CanvasSprite, xpos, ypos){
+		var placeHolder = [];
+		var spritePlaceHolder = [] as Array<Point>;
+		
+		for(var pixel of sprite.sprite){
+			
+		};
+		var _sprite = new CanvasSprite(spritePlaceHolder);
+		for(var _pixel of this.frame){
+			for(var pixel of sprite.sprite){
+				if(pixel != _pixel){
+					placeHolder.push(pixel);
+				};
+			};
+		};
+		this.frame = placeHolder;
+	};
 }
- 
+
+class CanvasSprite{
+	// Start Position must be x=0, y=0
+	constructor(public sprite:Array<Point>){
+	};
+};
+
 class Canvas {
     last:Frame;
     constructor(public id:string, public w=0, public h=0) {
@@ -38,12 +60,15 @@ class Canvas {
     }
     draw(frame:Frame) : Frame {
         var canvasx = this._self().getContext('2d');
+        
         for(var pixel of frame.frame){
+            canvasx.beginPath();
             canvasx.fillStyle = pixel.color;
             canvasx.fillRect(pixel.x, pixel.y, pixel.size, pixel.size);
+            canvasx.closePath();
         }
         this.last = frame;
-	return frame;
+	    return frame;
     }
     clear(frame:Frame) : Boolean {
         var canvasx = this.self().getContext("2d");
@@ -53,13 +78,17 @@ class Canvas {
         return true;
     }
     clearLast() : Boolean {
-	if(this.last == null){
-	    return;
-	}
+	    if(this.last == undefined){
+	        return;
+	    }
         var canvasx = this.self().getContext("2d");
         for(var pixel of this.last.frame){
             canvasx.clearRect(pixel.x, pixel.y, pixel.size, pixel.size);
         }
+        return true;
+    }
+    clearAll() : Boolean {
+        this.__self().getContext("2d").clearRect(0, 0, this.__self().width, this.__self().height);
         return true;
     }
 }
@@ -100,6 +129,7 @@ class CanvasAnimation2D {
     };
     private _play(time){
         var self = this;
+        var _last = self.frames[0];
         self._animationTime = self.frames.length;
         self._inter = setInterval(reDraw, time);
         function reDraw(){
@@ -107,8 +137,8 @@ class CanvasAnimation2D {
                 clearInterval(self._inter);
             } else {
                 // Draw frames
-                self._canvas.clearLast();
-                self._canvas.draw(self.frames[self._frameNumber]);
+                self._canvas.clearAll();
+                _last = self._canvas.draw(self.frames[self._frameNumber]);
                 self._frameNumber += 1;
                 self._animationTime -= 1;
             };
@@ -118,7 +148,7 @@ class CanvasAnimation2D {
 
 function toInt(fl:number) : Number {
 	return (parseInt(fl.toString()));
-}
+};
 function calculate(_i:number, _act=Math.PI) : Frame {
 	var frame = new Frame([]);
 	var i = 0;
@@ -152,24 +182,24 @@ function main(){
     
     //initialize a frame Array to get all of then
     var frames = [];
-	
+    
     // 60 frames per 5 seconds = 5*60
-     for(var i=1;i<(60*5);i++){
-
-   // Append a new Point(x,y, color, size) per frame
-   var _point = new Point(i, 50, "black", 22);
-   frames.push(new Frame([_point]));
-   }
-   // Create a new Canvas intance
-   let canvas = new Canvas('area', 500, 500);
-	
+    for(var i=1;i<(60*5);i++){
+        
+        // Append a new Point(x,y, color, size) per frame
+        var _point = new Point(i, 50, "black", 22);
+        frames.push(new Frame([_point]));
+    }
+    // Create a new Canvas intance
+    let canvas = new Canvas('area', 500, 500);
+    
     // Create a new Canvas Animation 2D, for the animation
     let animationCanvas = new CanvasAnimation2D('area', frames); //CanvasAnimation2D(canvasId, frames)
     
     // Button on click, do function =>
     button.onclick = function(){
-        // for every frame, give 5 milliseconds
-        animationCanvas.play(5);
+            // for every frame, give 5 milliseconds
+            animationCanvas.play(5);
     };
     
     // Create the canvas on the DOM(HTML page ative)
@@ -181,5 +211,5 @@ function main(){
 
 
 //=>
-main(); 
-*/
+main();
+*/ 
