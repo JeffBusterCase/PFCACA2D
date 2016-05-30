@@ -1,7 +1,4 @@
-// PFCACA2D version 0.5
-// This library require Jquery.js!!
-// Remenber to put it in your html file!
-// animate code by Jefferson Bomfim AKA jeffbustercase
+// PFCACA2D version 0.7
 
 class Point {
     constructor(public x:number, public y:number, public color:string,  public size=1){
@@ -32,36 +29,43 @@ class Canvas {
     self(){
         return document.querySelector("#"+this.id) as HTMLCanvasElement;
     }
-	_self(){
-		return document.getElementById(this.id) as HTMLCanvasElement;
-	}
-	__self(){
-		return document.getElementById(this.id);	
-	}
+    _self(){
+	return document.getElementById(this.id) as HTMLCanvasElement;
+    }
+     __self(){
+	return document.getElementById(this.id);	
+    }
     draw(frame:Frame) : Frame {
         var canvasx = this._self().getContext('2d');
+        
         for(var pixel of frame.frame){
+            canvasx.beginPath();
             canvasx.fillStyle = pixel.color;
             canvasx.fillRect(pixel.x, pixel.y, pixel.size, pixel.size);
+            canvasx.closePath();
         }
         this.last = frame;
-		return frame;
+	    return frame;
     }
     clear(frame:Frame) : Boolean {
         var canvasx = this.self().getContext("2d");
         for(var pixel of frame.frame){
-           	canvasx.clearRect(pixel.x, pixel.y, pixel.size, pixel.size);
+           canvasx.clearRect(pixel.x, pixel.y, pixel.size, pixel.size);
         }
         return true;
     }
     clearLast() : Boolean {
-		if(this.last == null){
-			return;
-		}
+	    if(this.last == undefined){
+	        return;
+	    }
         var canvasx = this.self().getContext("2d");
         for(var pixel of this.last.frame){
             canvasx.clearRect(pixel.x, pixel.y, pixel.size, pixel.size);
         }
+        return true;
+    }
+    clearAll() : Boolean {
+        this.__self().getContext("2d").clearRect(0, 0, this.__self().width, this.__self().height);
         return true;
     }
 }
@@ -102,6 +106,7 @@ class CanvasAnimation2D {
     };
     private _play(time){
         var self = this;
+        var _last = self.frames[0];
         self._animationTime = self.frames.length;
         self._inter = setInterval(reDraw, time);
         function reDraw(){
@@ -109,8 +114,8 @@ class CanvasAnimation2D {
                 clearInterval(self._inter);
             } else {
                 // Draw frames
-                self._canvas.clearLast();
-                self._canvas.draw(self.frames[self._frameNumber]);
+                self._canvas.clearAll();
+                _last = self._canvas.draw(self.frames[self._frameNumber]);
                 self._frameNumber += 1;
                 self._animationTime -= 1;
             };
@@ -120,7 +125,7 @@ class CanvasAnimation2D {
 
 function toInt(fl:number) : Number {
 	return (parseInt(fl.toString()));
-}
+};
 function calculate(_i:number, _act=Math.PI) : Frame {
 	var frame = new Frame([]);
 	var i = 0;
@@ -136,6 +141,7 @@ function rand(x:number){
 	return Math.floor(Math.random() * x);
 }
 function  rands(x:number) {return rand(x).toString();};
+
 
 // 
 // main
