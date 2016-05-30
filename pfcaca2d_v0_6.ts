@@ -1,4 +1,4 @@
-// PFCACA2D version 0.7
+// PFCACA2D version 0.6
 
 class Point {
     constructor(public x:number, public y:number, public color:string,  public size=1){
@@ -11,8 +11,31 @@ class Frame {
 	append(point:Point){
 		this.frame.push(point);
 	}
+	addSprite(sprite:CanvasSprite, xpos, ypos){
+		var placeHolder = [];
+		var spritePlaceHolder = [] as Array<Point>;
+		
+		for(var pixel of sprite.sprite){
+			
+		};
+		var _sprite = new CanvasSprite(spritePlaceHolder);
+		for(var _pixel of this.frame){
+			for(var pixel of sprite.sprite){
+				if(pixel != _pixel){
+					placeHolder.push(pixel);
+				};
+			};
+		};
+		this.frame = placeHolder;
+	};
 }
- 
+
+class CanvasSprite{
+	// Start Position must be x=0, y=0
+	constructor(public sprite:Array<Point>){
+	};
+};
+
 class Canvas {
     last:Frame;
     constructor(public id:string, public w=0, public h=0) {
@@ -30,10 +53,10 @@ class Canvas {
         return document.querySelector("#"+this.id) as HTMLCanvasElement;
     }
     _self(){
-	    return document.getElementById(this.id) as HTMLCanvasElement;
+	return document.getElementById(this.id) as HTMLCanvasElement;
     }
      __self(){
-	    return document.getElementById(this.id);	
+	return document.getElementById(this.id);	
     }
     draw(frame:Frame) : Frame {
         var canvasx = this._self().getContext('2d');
@@ -141,53 +164,3 @@ function rand(x:number){
 	return Math.floor(Math.random() * x);
 }
 function  rands(x:number) {return rand(x).toString();};
-
-
-// 
-// main
-//
-/*
- * Example how to use it *
- *
-function main(){
-    // Create Button to start the animation
-    let button = document.createElement("button");
-	button.textContent = "animate";
-	button.style.backgroundColor = "blue";
-    button.style.color = "white";
-    button.style.borderRadius = "3px";
-    button.style.border = "solid white 1px";
-    
-    //initialize a frame Array to get all of then
-	var frames = [];
-	
-	// 60 frames per 5 seconds = 5*60
-	for(var i=1;i<(60*5);i++){
-	    
-	    // Append a new Point(x,y, color, size) per frame
-        var _point = new Point(i, 50, "black", 22);
-        frames.push(new Frame([_point]));
-	}
-	// Create a new Canvas intance
-	let canvas = new Canvas('area', 500, 500);
-	
-	// Create a new Canvas Animation 2D, for the animation
-    let animationCanvas = new CanvasAnimation2D('area', frames); //CanvasAnimation2D(canvasId, frames)
-    
-    // Button on click, do function =>
-    button.onclick = function(){
-            // for every frame, give 5 milliseconds
-            animationCanvas.play(5);
-    };
-    
-    // Create the canvas on the DOM(HTML page ative)
-    canvas.create();
-    
-    // Create the button on the DOM(HTML page ative(again...))
-    document.body.appendChild(button);
-}
-
-
-//=>
-main(); 
-*/

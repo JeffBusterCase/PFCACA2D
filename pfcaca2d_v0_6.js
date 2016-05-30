@@ -1,4 +1,4 @@
-// PFCACA2D version 0.7
+// PFCACA2D version 0.6
 var Point = (function () {
     function Point(x, y, color, size) {
         if (size === void 0) { size = 1; }
@@ -16,8 +16,40 @@ var Frame = (function () {
     Frame.prototype.append = function (point) {
         this.frame.push(point);
     };
+    Frame.prototype.addSprite = function (sprite, xpos, ypos) {
+        var placeHolder = [];
+        var spritePlaceHolder = [];
+        for (var _a = 0, _b = sprite.sprite; _a < _b.length; _a++) {
+            var pixel = _b[_a];
+        }
+        ;
+        var _sprite = new CanvasSprite(spritePlaceHolder);
+        for (var _c = 0, _d = this.frame; _c < _d.length; _c++) {
+            var _pixel = _d[_c];
+            for (var _e = 0, _f = sprite.sprite; _e < _f.length; _e++) {
+                var pixel = _f[_e];
+                if (pixel != _pixel) {
+                    placeHolder.push(pixel);
+                }
+                ;
+            }
+            ;
+        }
+        ;
+        this.frame = placeHolder;
+    };
+    ;
     return Frame;
 }());
+var CanvasSprite = (function () {
+    // Start Position must be x=0, y=0
+    function CanvasSprite(sprite) {
+        this.sprite = sprite;
+    }
+    ;
+    return CanvasSprite;
+}());
+;
 var Canvas = (function () {
     function Canvas(id, w, h) {
         if (w === void 0) { w = 0; }
@@ -212,4 +244,4 @@ function main(){
 
 //=>
 main();
-*/ 
+*/
