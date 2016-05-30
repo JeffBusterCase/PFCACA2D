@@ -1,5 +1,4 @@
 // PFCACA2D version 0.6
-// animate code by Jefferson Bomfim AKA jeffbustercase
 var Point = (function () {
     function Point(x, y, color, size) {
         if (size === void 0) { size = 1; }
@@ -17,8 +16,40 @@ var Frame = (function () {
     Frame.prototype.append = function (point) {
         this.frame.push(point);
     };
+    Frame.prototype.addSprite = function (sprite, xpos, ypos) {
+        var placeHolder = [];
+        var spritePlaceHolder = [];
+        for (var _a = 0, _b = sprite.sprite; _a < _b.length; _a++) {
+            var pixel = _b[_a];
+        }
+        ;
+        var _sprite = new CanvasSprite(spritePlaceHolder);
+        for (var _c = 0, _d = this.frame; _c < _d.length; _c++) {
+            var _pixel = _d[_c];
+            for (var _e = 0, _f = sprite.sprite; _e < _f.length; _e++) {
+                var pixel = _f[_e];
+                if (pixel != _pixel) {
+                    placeHolder.push(pixel);
+                }
+                ;
+            }
+            ;
+        }
+        ;
+        this.frame = placeHolder;
+    };
+    ;
     return Frame;
 }());
+var CanvasSprite = (function () {
+    // Start Position must be x=0, y=0
+    function CanvasSprite(sprite) {
+        this.sprite = sprite;
+    }
+    ;
+    return CanvasSprite;
+}());
+;
 var Canvas = (function () {
     function Canvas(id, w, h) {
         if (w === void 0) { w = 0; }
@@ -49,8 +80,10 @@ var Canvas = (function () {
         var canvasx = this._self().getContext('2d');
         for (var _a = 0, _b = frame.frame; _a < _b.length; _a++) {
             var pixel = _b[_a];
+            canvasx.beginPath();
             canvasx.fillStyle = pixel.color;
             canvasx.fillRect(pixel.x, pixel.y, pixel.size, pixel.size);
+            canvasx.closePath();
         }
         this.last = frame;
         return frame;
@@ -64,7 +97,7 @@ var Canvas = (function () {
         return true;
     };
     Canvas.prototype.clearLast = function () {
-        if (this.last == null) {
+        if (this.last == undefined) {
             return;
         }
         var canvasx = this.self().getContext("2d");
@@ -72,6 +105,10 @@ var Canvas = (function () {
             var pixel = _b[_a];
             canvasx.clearRect(pixel.x, pixel.y, pixel.size, pixel.size);
         }
+        return true;
+    };
+    Canvas.prototype.clearAll = function () {
+        this.__self().getContext("2d").clearRect(0, 0, this.__self().width, this.__self().height);
         return true;
     };
     return Canvas;
@@ -117,6 +154,7 @@ var CanvasAnimation2D = (function () {
     ;
     CanvasAnimation2D.prototype._play = function (time) {
         var self = this;
+        var _last = self.frames[0];
         self._animationTime = self.frames.length;
         self._inter = setInterval(reDraw, time);
         function reDraw() {
@@ -125,8 +163,8 @@ var CanvasAnimation2D = (function () {
             }
             else {
                 // Draw frames
-                self._canvas.clearLast();
-                self._canvas.draw(self.frames[self._frameNumber]);
+                self._canvas.clearAll();
+                _last = self._canvas.draw(self.frames[self._frameNumber]);
                 self._frameNumber += 1;
                 self._animationTime -= 1;
             }
@@ -141,6 +179,7 @@ var CanvasAnimation2D = (function () {
 function toInt(fl) {
     return (parseInt(fl.toString()));
 }
+;
 function calculate(_i, _act) {
     if (_act === void 0) { _act = Math.PI; }
     var frame = new Frame([]);
@@ -205,4 +244,4 @@ function main(){
 
 //=>
 main();
-*/ 
+*/
