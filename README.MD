@@ -1,11 +1,12 @@
 
+
+```typescript
 // 
 // main
 //
 /*
  * Example how to use it *
  */
-```typescript
 function main(){
     // Create Button to start the animation
     let button = document.createElement("button");
