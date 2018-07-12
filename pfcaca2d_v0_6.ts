@@ -1,5 +1,11 @@
 // PFCACA2D version 0.6
 
+// Util
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// PFCACA2D
 class Point {
     constructor(public x:number, public y:number, public color:string,  public size=1){
     }
@@ -118,29 +124,46 @@ class CanvasAnimation2D {
     _frameNumber:number;
     _canvas:Canvas;
     _inter;    
-    _animationTime:number;
+    _animationTime: number;
+    is_playing:boolean;
     self;
     constructor(public canvasId:string, public frames:Array<Frame>){
     };
-    public play(time=this.frames.length){
+    public play(time=this.frames.length, fps){
         this._canvas = new Canvas(this.canvasId);
         this._frameNumber = 0;
-        this._play(time);
+        this._play(time, fps);
     };
-    private _play(time){
+    private _play(time, fps) {
         var self = this;
+        if (self.is_playing) {
+            window.cancelAnimationFrame(self._inter);
+        }
+        self.is_playing = true;
         var _last = self.frames[0];
         self._animationTime = self.frames.length;
-        self._inter = setInterval(reDraw, time);
-        function reDraw(){
-            if(self._animationTime == 0){
-                clearInterval(self._inter);
+        var must_pass = 1.0 / fps;
+        var delta;
+        var last_time = Date.now()/1000;
+        self._inter = window.requestAnimationFrame(reDraw);
+        async function reDraw() {
+            delta = (Date.now()/1000) - last_time;
+            delta = delta >= 0 ? delta : 0;
+            if (time <= 0) {
+                window.cancelAnimationFrame(self._inter);
+                self.is_playing = false;
             } else {
                 // Draw frames
                 self._canvas.clearAll();
                 _last = self._canvas.draw(self.frames[self._frameNumber]);
                 self._frameNumber += 1;
-                self._animationTime -= 1;
+                // correct frames per seconds
+                if (delta <= must_pass) {
+                    await sleep((must_pass - delta)*1000);
+                }
+                time -= must_pass;
+                last_time = Date.now() / 1000;
+                self._inter = window.requestAnimationFrame(reDraw);
             };
         };
     };
