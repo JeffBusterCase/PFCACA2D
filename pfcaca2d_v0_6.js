@@ -90,6 +90,61 @@ var CanvasSprite = /** @class */ (function () {
     return CanvasSprite;
 }());
 ;
+var Vertex = /** @class */ (function () {
+    function Vertex(x, y, z) {
+        this.x = parseFloat(x);
+        this.y = parseFloat(y);
+        this.z = parseFloat(z);
+    }
+    return Vertex;
+}());
+var Obj3D = /** @class */ (function () {
+    function Obj3D() {
+    }
+    Obj3D.translate = function (obj, to) {
+        for (var i = 0; i < obj.vertices.length; i++) {
+            obj.vertices[i].x += to.x;
+            obj.vertices[i].y += to.y;
+            obj.vertices[i].z += to.z;
+        }
+    };
+    Obj3D.newCube = function (center, size) {
+        // Generate the vertices
+        var d = size / 2;
+        var obj = new Obj3D();
+        obj.vertices = [
+            new Vertex(center.x - d, center.y - d, center.z + d),
+            new Vertex(center.x - d, center.y - d, center.z - d),
+            new Vertex(center.x + d, center.y - d, center.z - d),
+            new Vertex(center.x + d, center.y - d, center.z + d),
+            new Vertex(center.x + d, center.y + d, center.z + d),
+            new Vertex(center.x + d, center.y + d, center.z - d),
+            new Vertex(center.x - d, center.y + d, center.z - d),
+            new Vertex(center.x - d, center.y + d, center.z + d)
+        ];
+        // Generate the faces
+        obj.faces = [
+            [obj.vertices[0], obj.vertices[1], obj.vertices[2], obj.vertices[3]],
+            [obj.vertices[3], obj.vertices[2], obj.vertices[5], obj.vertices[4]],
+            [obj.vertices[4], obj.vertices[5], obj.vertices[6], obj.vertices[7]],
+            [obj.vertices[7], obj.vertices[6], obj.vertices[1], obj.vertices[0]],
+            [obj.vertices[7], obj.vertices[0], obj.vertices[3], obj.vertices[4]],
+            [obj.vertices[1], obj.vertices[6], obj.vertices[5], obj.vertices[2]]
+        ];
+        return obj;
+    };
+    return Obj3D;
+}());
+var Vertex2D = /** @class */ (function () {
+    function Vertex2D(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    return Vertex2D;
+}());
+function project(M) {
+    return new Vertex2D(M.x, M.z);
+}
 var Canvas = /** @class */ (function () {
     function Canvas(id, w, h) {
         if (w === void 0) { w = 0; }
@@ -127,6 +182,31 @@ var Canvas = /** @class */ (function () {
         }
         this.last = frame;
         return frame;
+    };
+    Canvas.prototype.draw3D = function (objects, dx, dy) {
+        var ctx = this._self().getContext('2d');
+        var face, P;
+        // For each object
+        for (var i = 0, n_obj = objects.length; i < n_obj; ++i) {
+            // For each face
+            for (var j = 0, n_faces = objects[i].faces.length; j < n_faces; ++j) {
+                // Current face
+                face = objects[i].faces[j];
+                // Draw the first vertex
+                P = project(face[0]);
+                ctx.beginPath();
+                ctx.moveTo(P.x + dx, -P.y + dy);
+                // Draw the other vertices
+                for (var k = 1, n_vertices = face.length; k < n_vertices; ++k) {
+                    P = project(face[k]);
+                    ctx.lineTo(P.x + dx, -P.y + dy);
+                }
+                // Close the path and draw the face
+                ctx.closePath();
+                ctx.stroke();
+                ctx.fill();
+            }
+        }
     };
     Canvas.prototype.clear = function (frame) {
         var canvasx = this.self().getContext("2d");
