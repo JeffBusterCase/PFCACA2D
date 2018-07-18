@@ -123,8 +123,7 @@ class Animation {
 class CanvasAnimation2D {
     _frameNumber:number;
     _canvas:Canvas;
-    _inter;    
-    _animationTime: number;
+    _inter;
     is_playing:boolean;
     self;
     constructor(public canvasId:string, public frames:Array<Frame>){
@@ -135,19 +134,19 @@ class CanvasAnimation2D {
         this._play(time, fps);
     };
     private _play(time, fps) {
+        time *= 1000;
         var self = this;
         if (self.is_playing) {
             window.cancelAnimationFrame(self._inter);
         }
         self.is_playing = true;
         var _last = self.frames[0];
-        self._animationTime = self.frames.length;
-        var must_pass = 1.0 / fps;
+        var must_pass = (1000.0 / fps);
         var delta;
-        var last_time = Date.now()/1000;
+        var last_time = Date.now();
         self._inter = window.requestAnimationFrame(reDraw);
         async function reDraw() {
-            delta = (Date.now()/1000) - last_time;
+            delta = (Date.now()) - last_time;
             delta = delta >= 0 ? delta : 0;
             if (time <= 0) {
                 window.cancelAnimationFrame(self._inter);
@@ -159,10 +158,10 @@ class CanvasAnimation2D {
                 self._frameNumber += 1;
                 // correct frames per seconds
                 if (delta <= must_pass) {
-                    await sleep((must_pass - delta)*1000);
+                    await sleep((must_pass - delta));
                 }
                 time -= must_pass;
-                last_time = Date.now() / 1000;
+                last_time = Date.now();
                 self._inter = window.requestAnimationFrame(reDraw);
             };
         };
