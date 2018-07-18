@@ -193,23 +193,23 @@ var CanvasAnimation2D = /** @class */ (function () {
     };
     ;
     CanvasAnimation2D.prototype._play = function (time, fps) {
+        time *= 1000;
         var self = this;
         if (self.is_playing) {
             window.cancelAnimationFrame(self._inter);
         }
         self.is_playing = true;
         var _last = self.frames[0];
-        self._animationTime = self.frames.length;
-        var must_pass = 1.0 / fps;
+        var must_pass = (1000.0 / fps);
         var delta;
-        var last_time = Date.now() / 1000;
+        var last_time = Date.now();
         self._inter = window.requestAnimationFrame(reDraw);
         function reDraw() {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            delta = (Date.now() / 1000) - last_time;
+                            delta = (Date.now()) - last_time;
                             delta = delta >= 0 ? delta : 0;
                             if (!(time <= 0)) return [3 /*break*/, 1];
                             window.cancelAnimationFrame(self._inter);
@@ -221,13 +221,13 @@ var CanvasAnimation2D = /** @class */ (function () {
                             _last = self._canvas.draw(self.frames[self._frameNumber]);
                             self._frameNumber += 1;
                             if (!(delta <= must_pass)) return [3 /*break*/, 3];
-                            return [4 /*yield*/, sleep((must_pass - delta) * 1000)];
+                            return [4 /*yield*/, sleep((must_pass - delta))];
                         case 2:
                             _a.sent();
                             _a.label = 3;
                         case 3:
                             time -= must_pass;
-                            last_time = Date.now() / 1000;
+                            last_time = Date.now();
                             self._inter = window.requestAnimationFrame(reDraw);
                             _a.label = 4;
                         case 4:
