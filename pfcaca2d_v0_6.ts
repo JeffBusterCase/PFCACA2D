@@ -41,6 +41,68 @@ class CanvasSprite{
 	constructor(public sprite:Array<Point>){
 	};
 };
+class Vertex {
+    x: number;
+    y: number;
+    z: number;
+    constructor(x,y,z) {
+        this.x = parseFloat(x);
+        this.y = parseFloat(y);
+        this.z = parseFloat(z);
+    }
+}
+
+class Obj3D {
+    vertices: Array<Vertex>;
+    faces: Array<Array<Vertex>>;
+    public constructor() { }
+    public static translate(obj: Obj3D, to: Vertex) {
+        for (var i = 0; i < obj.vertices.length; i++){
+            obj.vertices[i].x += to.x;
+            obj.vertices[i].y += to.y;
+            obj.vertices[i].z += to.z;
+        }
+    }
+    public static newCube(center, size) {
+        // Generate the vertices
+        var d = size / 2;
+        let obj = new Obj3D();
+        obj.vertices = [
+            new Vertex(center.x - d, center.y - d, center.z + d),
+            new Vertex(center.x - d, center.y - d, center.z - d),
+            new Vertex(center.x + d, center.y - d, center.z - d),
+            new Vertex(center.x + d, center.y - d, center.z + d),
+            new Vertex(center.x + d, center.y + d, center.z + d),
+            new Vertex(center.x + d, center.y + d, center.z - d),
+            new Vertex(center.x - d, center.y + d, center.z - d),
+            new Vertex(center.x - d, center.y + d, center.z + d)
+        ];
+
+        // Generate the faces
+        obj.faces = [
+            [obj.vertices[0], obj.vertices[1], obj.vertices[2], obj.vertices[3]],
+            [obj.vertices[3], obj.vertices[2], obj.vertices[5], obj.vertices[4]],
+            [obj.vertices[4], obj.vertices[5], obj.vertices[6], obj.vertices[7]],
+            [obj.vertices[7], obj.vertices[6], obj.vertices[1], obj.vertices[0]],
+            [obj.vertices[7], obj.vertices[0], obj.vertices[3], obj.vertices[4]],
+            [obj.vertices[1], obj.vertices[6], obj.vertices[5], obj.vertices[2]]
+        ];
+        return obj;
+    }
+}
+
+class Vertex2D {
+    x: number;
+    y: number;
+    public constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+function project(M) {
+    return new Vertex2D(M.x, M.z);
+}
 
 class Canvas {
     last:Frame;
@@ -75,6 +137,35 @@ class Canvas {
         }
         this.last = frame;
 	    return frame;
+    }
+    
+    draw3D(objects: Array<Obj3D>, dx, dy) {
+        let ctx = this._self().getContext('2d');
+        var face, P;
+        // For each object
+        for (var i = 0, n_obj = objects.length; i < n_obj; ++i) {
+            // For each face
+            for (var j = 0, n_faces = objects[i].faces.length; j < n_faces; ++j) {
+                // Current face
+                face = objects[i].faces[j];
+
+                // Draw the first vertex
+                P = project(face[0]);
+                ctx.beginPath();
+                ctx.moveTo(P.x + dx, -P.y + dy);
+
+                // Draw the other vertices
+                for (var k = 1, n_vertices = face.length; k < n_vertices; ++k) {
+                    P = project(face[k]);
+                    ctx.lineTo(P.x + dx, -P.y + dy);
+                }
+
+                // Close the path and draw the face
+                ctx.closePath();
+                ctx.stroke();
+                ctx.fill();
+            }
+        }
     }
     clear(frame:Frame) : Boolean {
         var canvasx = this.self().getContext("2d");
@@ -185,4 +276,4 @@ function calculate(_i:number, _act=Math.PI) : Frame {
 function rand(x:number){
 	return Math.floor(Math.random() * x);
 }
-function  rands(x:number) {return rand(x).toString();};
+function  rands
