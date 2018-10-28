@@ -1,4 +1,4 @@
-// PFCACA2D version 0.6
+// PFCACA2D version 0.65
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -86,15 +86,11 @@ var CanvasSprite = /** @class */ (function () {
     function CanvasSprite(sprite) {
         this.sprite = sprite;
     }
-    ;
     return CanvasSprite;
 }());
 ;
 var Vertex = /** @class */ (function () {
     function Vertex(x, y, z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
         this.x = parseFloat(x);
         this.y = parseFloat(y);
         this.z = parseFloat(z);
@@ -242,8 +238,6 @@ var Vertex2D = /** @class */ (function () {
     function Vertex2D(x, y) {
         this.x = x;
         this.y = y;
-        this.x = x;
-        this.y = y;
     }
     return Vertex2D;
 }());
@@ -334,7 +328,9 @@ var Canvas = /** @class */ (function () {
         var _this = this;
         // MOUSE OPERATIONS
         this.mouse = { x: 0, y: 0 };
-        window.addEventListener('mousemove', function (evt) {
+        // The function 'removeEventListener requires the function.
+        // so cannot pass it inline to addEventListener
+        this.handleMouse = function (evt) {
             var rect = _this.self().getBoundingClientRect();
             _this.mouse = {
                 x: evt.clientX - rect.left,
@@ -344,7 +340,8 @@ var Canvas = /** @class */ (function () {
             _this.mouse.y = _this.mouse.y > _this.h ? _this.h : _this.mouse.y;
             _this.mouse.x = _this.mouse.x < 0 ? 0 : _this.mouse.x;
             _this.mouse.y = _this.mouse.y < 0 ? 0 : _this.mouse.y;
-        }, false);
+        };
+        window.addEventListener('mousemove', this.handleMouse, false);
         function rerender() {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
@@ -366,17 +363,22 @@ var Canvas = /** @class */ (function () {
                 });
             });
         }
+        _this.isRendering = true;
         _this.raf = window.requestAnimationFrame(rerender);
     };
     Canvas.prototype.stopRender = function () {
-        try {
-            window.cancelAnimationFrame(this.raf);
+        if (this.isRendering) {
+            try {
+                window.cancelAnimationFrame(this.raf);
+            }
+            catch (Exception) {
+                return false;
+            }
+            this.isRendering = false;
+            window.removeEventListener('mousemove', this.handleMouse);
+            return true;
         }
-        catch (Exception) {
-            return false;
-        }
-        window.removeEventListener('mousemove');
-        return true;
+        return false;
     };
     Canvas.prototype.clear = function (frame) {
         var canvasx = this.self().getContext("2d");

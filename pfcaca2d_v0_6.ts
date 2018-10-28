@@ -1,4 +1,4 @@
-// PFCACA2D version 0.6
+// PFCACA2D version 0.65
 
 // Util
 function sleep(ms) {
@@ -7,22 +7,20 @@ function sleep(ms) {
 
 // PFCACA2D
 class Point {
-    constructor(public x:number, public y:number, public color:string,  public size=1){
-    }
+    constructor(public x:number, public y:number, public color:string,  public size=1){}
 }
 
 class Frame {
-    constructor(public frame:Array<Point>){
-    }
+    constructor(public frame:Array<Point>){}
     append(point:Point){
         this.frame.push(point);
     }
     addSprite(sprite:CanvasSprite, xpos, ypos){
         var placeHolder = [];
         var spritePlaceHolder = [] as Array<Point>;
-        
+
         for(var pixel of sprite.sprite){
-            
+
         };
         var _sprite = new CanvasSprite(spritePlaceHolder);
         for(var _pixel of this.frame){
@@ -38,11 +36,13 @@ class Frame {
 
 class CanvasSprite{
     // Start Position must be x=0, y=0
-    constructor(public sprite:Array<Point>){
-    };
+    constructor(public sprite:Array<Point>){}
 };
 class Vertex {
-    constructor(public x,public y,public z) {
+    public x: number;
+    public y : number;
+    public z : number;
+    constructor(x: any, y: any, z: any) {
         this.x = parseFloat(x);
         this.y = parseFloat(y);
         this.z = parseFloat(z);
@@ -77,7 +77,7 @@ function reorderFacesByPosition(faces:Array<Face>) : Array<Face> {
             }
         }
         f.push(medians.splice(medians.indexOf(front), 1)[0].face);
-    }    
+    }
     return f.reverse();
 }
 
@@ -93,8 +93,8 @@ interface FaceShader {
 
 function faceEquals(faceA:Array<Vertex>, faceB: Array<Vertex>) : boolean {
     for(var i in faceA){
-        if(faceA[i].x!=faceB[i].x && 
-            faceA[i].y!=faceB[i].y && 
+        if(faceA[i].x!=faceB[i].x &&
+            faceA[i].y!=faceB[i].y &&
             faceA[i].z!=faceB[i].z){
             return false;
         }
@@ -136,7 +136,7 @@ class Obj3D {
     public static rotate(obj: Obj3D, center: Vertex, theta, phi) {
         var v;
         for (var i = 0; i < obj.vertices.length; i++) {
-            v = obj.vertices[i]; 
+            v = obj.vertices[i];
             // Rotation matrix coefficients
             var ct = Math.cos(theta);
             var st = Math.sin(theta);
@@ -161,7 +161,7 @@ class Obj3D {
             mY+=v.y+position.y;
             mZ+=v.z+position.z;
         }
-        
+
         return new Vertex(mX/n, mY/n, mZ/n);
     }
     public static newCube(center: Vertex, size:number) : Obj3D {
@@ -199,19 +199,15 @@ class Obj3D {
 }
 
 class Vertex2D {
-    public constructor(public x: number, public y: number) {
-        this.x = x;
-        this.y = y;
-    }
+    public constructor(public x: number, public y: number) {}
 }
 
 class Camera {
-    constructor(public position: Vertex){
-    }
+    constructor(public position: Vertex){}
 }
 
 function project(M, camera: Camera, size: {w:number, h:number}) {
-   
+
     var x, y, r, d;
 
     x = M.x-camera.position.x + size.w/2;
@@ -221,9 +217,12 @@ function project(M, camera: Camera, size: {w:number, h:number}) {
 }
 
 class Canvas {
-    last:Frame;
+    private handleMouse;
+    public isRendering : boolean;
+    private last : Frame;
     private mouse : {x:number, y:number};
     private raf;
+
     constructor(public id:string, public w=0, public h=0) {
     }
     create(){
@@ -240,7 +239,7 @@ class Canvas {
     }
     draw(frame:Frame) : Frame {
         var canvasx = this.self().getContext('2d');
-        
+
         for(var pixel of frame.frame){
             canvasx.beginPath();
             canvasx.fillStyle = pixel.color;
@@ -257,12 +256,12 @@ class Canvas {
         let ctx = this.self().getContext('2d');
         ctx.fillStyle = 'white';
         let size = {w: this.w, h: this.h};
-        
+
         var face, P, hasShader;
 
         // For each object
         for (var i = 0, n_obj = objects.length; i < n_obj; ++i) {
-            
+
             // Don't render objects that aren't in front of the camera
             // if(Obj3D.getCenterByPosition(objects[i], pos).y < camera.position.y){
             //     continue;
@@ -288,7 +287,7 @@ class Canvas {
 
                 // Close the path and draw the face
                 ctx.closePath();
-                
+
                 ctx.fillStyle = objects[i].faces[j].shader.color.color;
 
                 // ctx.stroke();
@@ -305,7 +304,10 @@ class Canvas {
 
         // MOUSE OPERATIONS
         this.mouse = {x: 0,y:0};
-        window.addEventListener('mousemove', (evt)=>{
+
+        // The function 'removeEventListener requires the function.
+        // so cannot pass it inline to addEventListener
+        this.handleMouse = (evt)=>{
             let rect = _this.self().getBoundingClientRect();
             _this.mouse = {
                 x: evt.clientX - rect.left,
@@ -315,8 +317,10 @@ class Canvas {
             _this.mouse.y = _this.mouse.y>_this.h ? _this.h : _this.mouse.y;
             _this.mouse.x = _this.mouse.x<0 ? 0 : _this.mouse.x;
             _this.mouse.y = _this.mouse.y<0 ? 0 : _this.mouse.y;
-        }, false);
-        
+        };
+
+        window.addEventListener('mousemove', this.handleMouse, false);
+
 
         async function rerender() {
             _this.clearAll();
@@ -328,14 +332,19 @@ class Canvas {
             }
             _this.raf = window.requestAnimationFrame(rerender);
         }
+        _this.isRendering = true;
         _this.raf = window.requestAnimationFrame(rerender);
     }
     stopRender(){
-        try { window.cancelAnimationFrame(this.raf); } catch (Exception) {
-            return false;
+        if(this.isRendering){
+            try { window.cancelAnimationFrame(this.raf); } catch (Exception) {
+                return false;
+            }
+            this.isRendering = false;
+            window.removeEventListener('mousemove', this.handleMouse);
+            return true;
         }
-        window.removeEventListener('mousemove');
-        return true;
+        return false;
     }
     clear(frame:Frame) : Boolean {
         var canvasx = this.self().getContext("2d");
@@ -439,7 +448,7 @@ function calculate(_i:number, _act=Math.PI) : Frame {
         var _point = new Point(i, i*_act, "black");
         _point.size = 4;
         frame.append(_point);
-        i += 1; 
+        i += 1;
     }
     return frame;
 }
